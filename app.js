@@ -38,37 +38,49 @@ var closest = function(points, target){
        var d = Math.sqrt(
         sq( point.x - target.x ) + sq(point.y - target.y)
        )
-        console.log(d, target, point)
        if( d < smallestD){
            smallestD = d
            origin = point
        }
     })
-    return origin
+    return [origin,smallestD]
 }
 
 var vectors = []
 var points = []
+var hovered = null;
 
 var sq = function(val){ return val * val }
 var update = function(){
     mouse.update()
-    if(mouse.down == mouse.RELEASED ){
+    var origin = closest(points, mouse.lastClick)
+    var target = closest(points, mouse)
+
+     //hover
+    if(target[0] && target[1] < 15 ){
+
+        hovered = target[0];
+    } else {
+        hovered = null;
+    }
+
+    if(hovered && mouse.down > mouse.CLICKED && target[0]){
+        target[0].x = mouse.x
+        target[0].y = mouse.y
+    }
+
+    if(!hovered && mouse.down == mouse.RELEASED ){
         if(mouse.drag){
-            //find which points to join
-            console.log("drag")
-            
-            var origin = closest(points, mouse.lastClick)
-            var target = closest(points, mouse)
           
-            origin && target && vectors.push(
-                [origin,target]
+            origin[0] && target[0] && vectors.push(
+                [origin[0],target[0]]
             )
 
         } else {
             points.push( {x: mouse.x, y: mouse.y} )   
         }
     }
+   
 }
 
 var render = function(){
@@ -76,6 +88,7 @@ var render = function(){
     can.height = window.innerHeight
 
     points.forEach(function(point){
+        con.fillStyle = hovered == point && "aqua" || "black"
         con.fillRect(point.x-5,point.y-5,10,10)
     })
     vectors.forEach(function(vector){
