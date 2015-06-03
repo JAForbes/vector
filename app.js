@@ -64,6 +64,27 @@ var update = function(){
         }
     }
 
+    if( mouse.is.doubleclick){
+        if( hovered ){
+            //remove hovered
+            points.splice( points.indexOf(hovered), 1)
+
+
+            vectors.filter(function(vector, i){
+                return vector.indexOf(hovered) > -1
+            })
+            .forEach(function(vector){
+                vectors.splice( vectors.indexOf(vector), 1)
+            })
+
+        } else {
+            //remove last added
+            points.pop()
+        }
+    }
+
+
+
 }
 
 var render = function(){

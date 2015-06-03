@@ -6,8 +6,12 @@ var mouse = {
 
         var prepare = options.prepare
         var sequence = options.sequence
-
+        var set = options._set
         options._state.listeners = [
+            [
+                "dblclick",
+                prepare( set, [options.is, "doubleclick", 1] )
+            ],
             [
                 "mousemove",
                 prepare(options._saveEventPosition, [options.positions.current] )
@@ -16,12 +20,12 @@ var mouse = {
                 "mousedown",
                 sequence(
                     prepare(options._saveEventPosition, [options.positions.click] ),
-                    prepare(options._set, [options._state, "down", 1] )
+                    prepare(set, [options._state, "down", 1] )
                 )
             ],
             [
                 "mouseup",
-                prepare(options._set, [options._state, "down", 0] )
+                prepare(set, [options._state, "down", 0] )
             ]
         ]
 
@@ -48,6 +52,7 @@ var mouse = {
 
     _update: function(config, state, is){
 
+        var now = new Date().getTime()
 
         var pos = {
             current : mouse.positions.current,
@@ -56,7 +61,13 @@ var mouse = {
 
         is.down = state.down > 0
         is.release = state.down == 0
+
         is.click = state.down == 1
+
+
+        //"dblclick" event listener enables it, but we disable it here if we've seen it before (hence 2, for 2 updates)
+        is.doubleclick = is.doubleclick && is.doubleclick < 2
+
         is.initialised = is.initialised || (pos.current.x + pos.current.y + pos.click.x + pos.click.y) < Infinity
 
         is.drag = is.down && is.initialised && Math.abs(pos.current.x-pos.click.x) + Math.abs(pos.current.y-pos.click.y) > config.min_drag_distance
@@ -65,7 +76,7 @@ var mouse = {
         if( is.dragend ){
             is.dragstarted = null
         }
-        var now = new Date().getTime()
+
         if( is.drag && !is.dragstarted){
             is.dragstarted = now
         }
@@ -76,6 +87,8 @@ var mouse = {
         if(is.dragstart){
             is.dragended = null
         }
+
+        is.doubleclick += is.doubleclick ? 1 : 0
         state.down += is.down ? 1 : -1
 
     },
@@ -84,7 +97,7 @@ var mouse = {
         element: window,
         manual_update: false,
         min_drag_distance: 10,
-        update_frequency: 0
+        update_frequency: 0,
     },
 
     is: {
