@@ -23,6 +23,7 @@ var closest = function(points, target){
 
 var vectors = []
 var points = []
+var selected = null;
 var hovered = null;
 
 var sq = function(val){ return val * val }
@@ -32,15 +33,23 @@ var update = function(){
     var origin = closest(points, mouse.positions.click)
     var target = closest(points, mouse.positions.current)
 
-     //hover
-    if(mouse.is.down && target && target.distance < 15 ){
+
+    if(target && target.distance < 15 ){
         hovered = target.point;
-    } else if (!mouse.is.down){
+
+        if(mouse.is.click){
+            selected = hovered
+        }
+    } else {
         hovered = null;
     }
-    if(hovered){
-        hovered.x = mouse.positions.current.x
-        hovered.y = mouse.positions.current.y
+
+    if(mouse.is.release){
+        selected = null
+    }
+    if(selected && mouse.is.down){
+        selected.x = mouse.positions.current.x
+        selected.y = mouse.positions.current.y
     }
 
     if(!hovered && mouse.is.release ){
