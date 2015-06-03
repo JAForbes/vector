@@ -89,10 +89,13 @@ var update = function(){
 
 var render = function(){
     can.width = window.innerWidth
-    can.height = window.innerHeight
+    can.height = window.innerHeight * 0.8
 
     points.forEach(function(point){
-        con.fillStyle = hovered == point && "aqua" || "black"
+        con.fillStyle = selected == point ? "red" :
+            hovered == point ? "aqua" :
+            "black"
+
         con.fillRect(point.x-5,point.y-5,10,10)
     })
     vectors.forEach(function(vector){
