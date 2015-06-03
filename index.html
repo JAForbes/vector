@@ -1,6 +1,13 @@
 <html>
 	<head>
 		<style>
+			.unselectable {
+   				-moz-user-select: none;
+			   -khtml-user-select: none;
+			   -webkit-user-select: none;
+			   -ms-user-select: none;
+			   user-select: none;
+			}
 		    body, document {
 		        margin: 0;
 		        padding: 0;
@@ -15,9 +22,10 @@
 		<script src="mouse.js"></script>
 	    <script src="app.js"></script>
 	</body>
-	<p> Click: Create a point</p>
-	<p> Double Click: Delete a point</p>
-	<p> Drag between two points: Create a line</p>
-	<p> Click a point and drag : Drag a point <p>
-
+	<div class="unselectable">
+		<p> Click: Create a point</p>
+		<p> Double Click: Delete a point</p>
+		<p> Drag between two points: Create a line</p>
+		<p> Click a point and drag : Drag a point <p>
+	</div>
 </html>
