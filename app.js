@@ -167,11 +167,14 @@ var render = function(){
     can.height = window.innerHeight * 0.8
 
     each(function(point){
-        con.fillStyle = selected == point ? "red" :
+        if(point.nVectors == 0 || point == hovered || point == selected){
+            con.fillStyle = selected == point ? "red" :
             hovered == point ? "aqua" :
             "black"
 
-        con.fillRect(point.position.x-5,point.position.y-5,10,10)
+            con.fillRect(point.position.x-5,point.position.y-5,10,10)
+        }
+
     }, points)
     each(function(vector){
         var a = points[vector.points[0]].position
