@@ -30,6 +30,15 @@ var update = function(){
     var target = closest(points, { position: mouse.positions.current } )
 
 
+    var tolerance = tolerance = Math.PI/50
+    hovered_line = null;
+    each(function(vector){
+        var isNear = point_near_vector( tolerance, mouse.positions.current ,standardise.vector(points, vector))
+        if ( isNear ){
+            hovered_line = vector
+        }
+    },vectors)
+
     if(target && target.distance < 15 ){
         hovered = target.point;
 
@@ -91,6 +100,8 @@ var render = function(){
         var b = points[vector.points[1]].position
 
         con.beginPath()
+        con.strokeStyle = vector == hovered_line ? "red" : "black"
+
         con.moveTo(a.x, a.y)
         con.lineTo(b.x,b.y)
         con.stroke()
@@ -128,6 +139,7 @@ var vectors = {}
 var points = {}
 var selected = null;
 var hovered = null;
+var hovered_line = null;
 
 var can = document.createElement("canvas")
 var con = can.getContext("2d")
