@@ -51,15 +51,7 @@ var points = {}
 
 var add = {
 
-    init: function(vectors, points){
-        //create a shorthand stateful API
-        //where vectors, and points don't need to be passed in
-        this.vector = this._vector.bind(null, vectors)
-        this.point = this._point.bind(null, points)
-    },
-
-    //public vector: (a,b)
-    _vector: function(vectors, a, b){
+    vector: function(vectors, a, b){
         var id = uid("vector_")
 
         //create vector
@@ -72,8 +64,7 @@ var add = {
         return id
     },
 
-    //public point: (position)
-    _point: function( points, position ){
+    point: function( points, position ){
         var id = uid("point_")
         points[id] = { id: id, position: position, vectors: {}, nVectors: 0 }
         return id
@@ -82,10 +73,7 @@ var add = {
 
 var remove = {
 
-    init: add.init,
-
-    //public vector: ( vector || vector.id )
-    _vector: function(vectors, v){
+    vector: function(vectors, v){
         //accept id or vector object
         v = v.id && v || vectors[v]
 
@@ -101,9 +89,8 @@ var remove = {
         delete vectors[v.id]
     },
 
-    //public point: ( point )
-    _point: function(points, point){
-        each(remove.vector,point.vectors)
+    point: function(vectors, points, point){
+        each(remove.vector.bind(null, vectors),point.vectors)
         delete points[point.id]
     }
 }
@@ -141,10 +128,10 @@ var update = function(){
         if(mouse.is.dragend){
 
             origin.point && target.point &&
-                add.vector( origin.point, target.point)
+                add.vector( vectors, origin.point, target.point)
 
         } else {
-            add.point( {x: mouse.positions.current.x, y: mouse.positions.current.y} )
+            add.point(points, {x: mouse.positions.current.x, y: mouse.positions.current.y} )
 
         }
     }
@@ -152,11 +139,11 @@ var update = function(){
     if( mouse.is.doubleclick ){
         if( hovered ){
             //remove hovered
-            remove.point( hovered )
+            remove.point( points, hovered )
 
         } else {
             //remove last added
-            remove.point( target )
+            remove.point( points, target )
         }
     }
 
@@ -193,25 +180,26 @@ var loop = function(){
     requestAnimationFrame(loop)
 }
 
-var save = function(){
-    if(id_counter > 1){
-      localStorage.setItem("points",JSON.stringify(points))
-      localStorage.setItem("vectors",JSON.stringify(vectors))
-      localStorage.setItem("id_counter", id_counter )
+
+var persistence = {
+    save: function(){
+        if(id_counter > 1){
+          localStorage.setItem("points",JSON.stringify(points))
+          localStorage.setItem("vectors",JSON.stringify(vectors))
+          localStorage.setItem("id_counter", id_counter )
+        }
+    },
+    load: function(){
+        points = JSON.parse(localStorage.getItem("points"))
+        vectors = JSON.parse(localStorage.getItem("vectors"))
+        id_counter = 1 + Number(localStorage.getItem("id_counter")) || id_counter
+    },
+    clear: function(){
+        vectors = {}
+        points = {}
+        id_counter = 1
     }
 }
-
-
-var load = function(){
-
-    points = JSON.parse(localStorage.getItem("points"))
-    vectors = JSON.parse(localStorage.getItem("vectors"))
-    id_counter = 1 + Number(localStorage.getItem("id_counter")) || id_counter
-
-}
-load()
-
-setInterval(save,1000)
-add.init(vectors,points)
-remove.init(vectors,points)
+persistence.load()
+setInterval(persistence.save,1000)
 loop()
