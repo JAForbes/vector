@@ -176,10 +176,30 @@ persistence.load()
 setInterval(persistence.save,1000)
 loop()
 
-var ready = function(){
+var addStateElement = function(){
     var state_node = state_template_item.cloneNode(true)
     state_node.id=""
     state_list.appendChild(state_node)
-
 }
-document.addEventListener('DOMContentLoaded',ready)
+document.addEventListener('DOMContentLoaded',function(){
+    addStateElement()
+
+
+    //state list view logic
+    state_list.addEventListener("input",function(event){
+      var input = event.srcElement
+      var li = input.parentElement
+      var last_li = state_list.childNodes[state_list.childNodes.length-1]
+      var second_last_li =state_list.childNodes[state_list.childNodes.length-2]
+      var isEmpty = input.value.length == 0
+
+      if(li == last_li){
+        if(!isEmpty){
+          addStateElement()
+        }
+      }
+      if(li == second_last_li && isEmpty){
+        li.remove()
+      }
+    })
+})
