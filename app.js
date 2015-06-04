@@ -30,24 +30,30 @@ var update = function(){
     var target = closest(points, { position: mouse.positions.current } )
 
 
-    var tolerance = tolerance = Math.PI/50
-    hovered_line = null;
-    each(function(vector){
-        var isNear = point_near_vector( tolerance, mouse.positions.current ,standardise.vector(points, vector))
-        if ( isNear ){
-            hovered_line = vector
-        }
-    },vectors)
+    if(!hovered){
+        var tolerance = tolerance = Math.PI/50
+        hovered_line = null;
+        each(function(vector){
+            var isNear = point_near_vector( tolerance, mouse.positions.current ,standardise.vector(points, vector))
+            if ( isNear ){
+                hovered_line = vector
+            }
+        },vectors)
 
-    if(target && target.distance < 15 ){
-        hovered = target.point;
-
-        if(mouse.is.click){
-            selected = hovered
-        }
-    } else {
-        hovered = null;
     }
+
+    if(!hovered_line) {
+        if(target && target.distance < 15 ){
+            hovered = target.point;
+
+            if(mouse.is.click){
+                selected = hovered
+            }
+        } else {
+            hovered = null;
+        }
+    }
+
 
     if(mouse.is.release){
         selected = null
@@ -56,7 +62,7 @@ var update = function(){
         selected.position.x = mouse.positions.current.x
         selected.position.y = mouse.positions.current.y
     }
-    if(!hovered && mouse.is.release ){
+    if(!hovered && !hovered_line && mouse.is.release ){
         if(mouse.is.dragend){
 
             origin.point && target.point &&
@@ -72,10 +78,12 @@ var update = function(){
         if( hovered ){
             //remove hovered
             remove.point( vectors, points, hovered )
-
         } else {
             //remove last added
             remove.point( vectors, points, target )
+        }
+        if( hovered_line) {
+            remove.vector( vectors, hovered_line)
         }
     }
 
