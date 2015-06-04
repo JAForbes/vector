@@ -123,6 +123,7 @@ var persistence = {
     }
 }
 
+var id_counter = 1
 var vectors = {}
 var points = {}
 var selected = null;
