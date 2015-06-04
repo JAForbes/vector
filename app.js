@@ -121,7 +121,6 @@ var update = function(){
         selected.position.x = mouse.positions.current.x
         selected.position.y = mouse.positions.current.y
     }
-    mouse.is.release && console.log("release")
     if(!hovered && mouse.is.release ){
         if(mouse.is.dragend){
 
@@ -137,11 +136,11 @@ var update = function(){
     if( mouse.is.doubleclick ){
         if( hovered ){
             //remove hovered
-            remove.point( points, hovered )
+            remove.point( vectors, points, hovered )
 
         } else {
             //remove last added
-            remove.point( points, target )
+            remove.point( vectors, points, target )
         }
     }
 
