@@ -123,8 +123,8 @@ var persistence = {
         }
     },
     load: function(){
-        points = JSON.parse(localStorage.getItem("points"))
-        vectors = JSON.parse(localStorage.getItem("vectors"))
+        points = JSON.parse(localStorage.getItem("points")) || {}
+        vectors = JSON.parse(localStorage.getItem("vectors")) || {}
         id_counter = Number(localStorage.getItem("id_counter")) || id_counter
     },
     clear: function(){
