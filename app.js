@@ -2,12 +2,11 @@ var can = document.createElement("canvas")
 var con = can.getContext("2d")
 document.body.appendChild(can)
 
-mouse.config.manual_update = true
-mouse.startListening()
+
 
 var id_counter = 1;
 var uid = function(prefix){
-    return [prefix] + id_counter++
+    return [prefix] + ++id_counter
 }
 
 var each = function(visitor, obj){
@@ -101,7 +100,6 @@ var hovered = null;
 var sq = function(val){ return val * val }
 var update = function(){
     mouse.update()
-
     var origin = closest(points, { position: mouse.positions.click } )
     var target = closest(points, { position: mouse.positions.current } )
 
@@ -123,7 +121,7 @@ var update = function(){
         selected.position.x = mouse.positions.current.x
         selected.position.y = mouse.positions.current.y
     }
-
+    mouse.is.release && console.log("release")
     if(!hovered && mouse.is.release ){
         if(mouse.is.dragend){
 
@@ -192,7 +190,7 @@ var persistence = {
     load: function(){
         points = JSON.parse(localStorage.getItem("points"))
         vectors = JSON.parse(localStorage.getItem("vectors"))
-        id_counter = 1 + Number(localStorage.getItem("id_counter")) || id_counter
+        id_counter = Number(localStorage.getItem("id_counter")) || id_counter
     },
     clear: function(){
         vectors = {}
@@ -200,6 +198,10 @@ var persistence = {
         id_counter = 1
     }
 }
+
+mouse.config.manual_update = true
+mouse.config.element = can
+mouse.startListening()
 persistence.load()
 setInterval(persistence.save,1000)
 loop()

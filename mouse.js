@@ -32,6 +32,7 @@ var mouse = {
         var listener = options._state.listener = options.config.element
 
         options._state.listeners.forEach(function(listener_config){
+
             window.addEventListener.apply(listener, listener_config)
         })
 
