@@ -5,10 +5,10 @@ document.body.appendChild(can)
 mouse.config.manual_update = true
 mouse.startListening()
 
-var uid = (function (counter){ return function
-                    (prefix){
-    return [prefix] + counter++
-}})(1)
+var id_counter = 1;
+var uid = function(prefix){
+    return [prefix] + id_counter++
+}
 
 var each = function(visitor, obj){
     for(var key in obj){
@@ -192,6 +192,26 @@ var loop = function(){
     render()
     requestAnimationFrame(loop)
 }
+
+var save = function(){
+    if(id_counter > 1){
+      localStorage.setItem("points",JSON.stringify(points))
+      localStorage.setItem("vectors",JSON.stringify(vectors))
+      localStorage.setItem("id_counter", id_counter )
+    }
+}
+
+
+var load = function(){
+
+    points = JSON.parse(localStorage.getItem("points"))
+    vectors = JSON.parse(localStorage.getItem("vectors"))
+    id_counter = 1 + Number(localStorage.getItem("id_counter")) || id_counter
+
+}
+load()
+
+setInterval(save,1000)
 add.init(vectors,points)
 remove.init(vectors,points)
 loop()
