@@ -15,6 +15,42 @@
 		    canvas {
 		    	background-color: #EEE;
 		    }
+		    .full-width {
+		    	width: 100%;
+		    }
+		    .ne {
+		    	position: fixed;
+		    	top: 0;
+		    	right: 0;
+		    }
+		    .sw {
+		    	position: fixed;
+		    	bottom: 0;
+		    	left: 0;
+		    }
+		    .resizeable {
+		    	min-height: 50px;
+		    	max-height: 40%;
+		    	overflow-y: auto;
+		    	width: 500px;
+		    	resize: vertical;
+
+		    }
+		    .translucent {
+		    	background-color: rgba(255,255,255,0.8)
+		    }
+		    ul.plain {
+		    	list-style: none;
+		    }
+		    input {
+		    	height: 2em;
+		    	line-height: 2em;
+		    	vertical-align: middle;
+		    	margin-left: 1em;
+		    }
+		    .hidden {
+		    	display: none;
+		    }
 		</style>
 	</head>
 	<body>
@@ -23,11 +59,28 @@
 		<script src="vector.js"></script>
 	    <script src="app.js"></script>
 	</body>
+	<div class="hidden">
+
+		<li id="state_template_item">
+			<!-- <label>State: </label> -->
+			<input placeholder="default" type="text"></input>
+
+			<!-- <label> Stroke/Fill: </label> -->
+			<input type="color"></input>
+
+			<!-- <label> Width: </label> -->
+			<input type="range" max="10" min="11"></input>
+		</li>
+
+	</div>
 	<div class="unselectable">
-		<p> Click: Create a point</p>
-		<p> Double Click point/vector: Delete a point/vector</p>
-		<p> Drag between two points: Create a line</p>
-		<p> Click a point and drag : Drag a point <p>
-		<button onclick="persistence.clear()">Clear</button>
+		<div  class="resizeable translucent ne">
+			<ul id="state_list" class="plain">
+			</ul>
+		</div>
+		<div class="full-width sw translucent">
+			<button onclick="persistence.clear()">Clear</button>
+		</div>
+
 	</div>
 </html>

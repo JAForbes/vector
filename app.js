@@ -91,13 +91,17 @@ var update = function(){
 
 var render = function(){
     can.width = window.innerWidth
-    can.height = window.innerHeight * 0.8
+    can.height = window.innerHeight
 
     each(function(point){
-        if(point.nVectors == 0 || point == hovered || point == selected){
+        var style = state_types[states[point.id]]
+
+        if(point.nVectors == 0 || point == hovered || point == selected || style){
+            style = style || state_types["default"]
+
             con.fillStyle = selected == point ? "red" :
-            hovered == point ? "aqua" :
-            "black"
+            hovered == point ? "aqua" : style.fillStyle
+
 
             con.fillRect(point.position.x-5,point.position.y-5,10,10)
         }
@@ -108,7 +112,9 @@ var render = function(){
         var b = points[vector.points[1]].position
 
         con.beginPath()
-        con.strokeStyle = vector == hovered_line ? "red" : "black"
+        var style = state_types[states[vector.id]] || state_types["default"]
+        con.strokeStyle = vector == hovered_line ? "red" : style.strokeStyle
+        con.lineWidth = style.lineWidth
 
         con.moveTo(a.x, a.y)
         con.lineTo(b.x,b.y)
@@ -142,20 +148,38 @@ var persistence = {
     }
 }
 
+
 var id_counter = 1
 var vectors = {}
 var points = {}
+var state_types = {
+    "default" : { fillStyle: "black", strokeStyle:"black", lineWidth: 1 },
+    "special" : { fillStyle: "blue", strokeStyle:"blue", lineWidth: 1 },
+    "crazy" : { fillStyle: "orange", strokeStyle:"orange", lineWidth: 5 }
+}
+var states = {
+    "point_1" : "special",
+    "vector_10" : "crazy"
+}
 var selected = null;
 var hovered = null;
 var hovered_line = null;
 
 var can = document.createElement("canvas")
 var con = can.getContext("2d")
-document.body.appendChild(can)
 
+document.body.appendChild(can)
 mouse.config.manual_update = true
 mouse.config.element = can
 mouse.startListening()
 persistence.load()
 setInterval(persistence.save,1000)
 loop()
+
+var ready = function(){
+    var state_node = state_template_item.cloneNode(true)
+    state_node.id=""
+    state_list.appendChild(state_node)
+
+}
+document.addEventListener('DOMContentLoaded',ready)
