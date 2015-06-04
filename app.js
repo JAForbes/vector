@@ -1,14 +1,3 @@
-var can = document.createElement("canvas")
-var con = can.getContext("2d")
-document.body.appendChild(can)
-
-
-
-var id_counter = 1;
-var uid = function(prefix){
-    return [prefix] + ++id_counter
-}
-
 var each = function(visitor, obj){
     for(var key in obj){
         visitor(obj[key], key, obj)
@@ -33,69 +22,6 @@ var closest = function(points, target){
     return { point: origin, distance: shortestDistance }
 }
 
-
-
-/*
-    vectors = {
-        <id> : { id: <id> , points: [<id>,<id>] }
-    }
-*/
-var vectors = {}
-/*
-    points = {
-        <id> : { id: <id> , position: { x,y} , vectors: { <id> : true, <id> : true, ... }, nVectors: 0 }
-    }
-*/
-var points = {}
-
-var add = {
-
-    vector: function(vectors, a, b){
-        var id = uid("vector_")
-
-        //create vector
-        vectors[id] = { id: id, points: [a.id, b.id] }
-
-        //create a look up for this vector on the points
-        a.vectors[id] = b.vectors[id] = id
-        a.nVectors++
-        b.nVectors++
-        return id
-    },
-
-    point: function( points, position ){
-        var id = uid("point_")
-        points[id] = { id: id, position: position, vectors: {}, nVectors: 0 }
-        return id
-    }
-}
-
-var remove = {
-
-    vector: function(vectors, v){
-        //accept id or vector object
-        v = v.id && v || vectors[v]
-
-        var id = v.id
-
-        //remove vector lookup from points
-        v.points.forEach(function(point_id){
-            delete points[point_id].vectors[id]
-            points[point_id].nVectors--
-        })
-
-        //remove vector from vectors collection
-        delete vectors[v.id]
-    },
-
-    point: function(vectors, points, point){
-        each(remove.vector.bind(null, vectors),point.vectors)
-        delete points[point.id]
-    }
-}
-
-var selected = null;
-var hovered = null;
 
 var sq = function(val){ return val * val }
 var update = function(){
@@ -125,10 +51,10 @@ var update = function(){
         if(mouse.is.dragend){
 
             origin.point && target.point &&
-                add.vector( vectors, origin.point, target.point)
+                add.vector( id_counter++, vectors, origin.point, target.point)
 
         } else {
-            add.point(points, {x: mouse.positions.current.x, y: mouse.positions.current.y} )
+            add.point(id_counter++, points, {x: mouse.positions.current.x, y: mouse.positions.current.y} )
 
         }
     }
@@ -177,7 +103,6 @@ var loop = function(){
     requestAnimationFrame(loop)
 }
 
-
 var persistence = {
     save: function(){
         if(id_counter > 1){
@@ -197,6 +122,15 @@ var persistence = {
         id_counter = 1
     }
 }
+
+var vectors = {}
+var points = {}
+var selected = null;
+var hovered = null;
+
+var can = document.createElement("canvas")
+var con = can.getContext("2d")
+document.body.appendChild(can)
 
 mouse.config.manual_update = true
 mouse.config.element = can
