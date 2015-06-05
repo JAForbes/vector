@@ -37,20 +37,7 @@ var update = function(){
     var origin = closest(points, { position: mouse.positions.click } )
     var target = closest(points, { position: mouse.positions.current } )
 
-
-    if(!hovered){
-        var tolerance = tolerance = Math.PI/50
-        hovered_line = null;
-        each(function(vector){
-            var isNear = point_near_vector( tolerance, mouse.positions.current ,standardise.vector(points, vector))
-            if ( isNear ){
-                hovered_line = vector
-            }
-        },vectors)
-
-    }
-
-    if(!hovered_line) {
+     if(!hovered_line) {
         if(target && target.distance < 15 ){
             hovered = target.point;
 
@@ -61,6 +48,20 @@ var update = function(){
             hovered = null;
         }
     }
+
+    if(!hovered){
+        var tolerance = tolerance = Math.PI/80
+        hovered_line = null;
+        each(function(vector){
+            var isNear = point_near_vector( tolerance, mouse.positions.current ,standardise.vector(points, vector))
+            if ( isNear ){
+                hovered_line = vector
+            }
+        },vectors)
+
+    }
+
+
 
 
     if(mouse.is.release){
