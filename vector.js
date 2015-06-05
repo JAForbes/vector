@@ -25,7 +25,7 @@ var add = {
 
 var remove = {
 
-    vector: function(vectors, v){
+    vector: function(states, vectors, v){
         //accept id or vector object
         v = v.id && v || vectors[v]
 
@@ -39,11 +39,13 @@ var remove = {
 
         //remove vector from vectors collection
         delete vectors[v.id]
+        delete states[v.id]
     },
 
-    point: function(vectors, points, point){
-        each(remove.vector.bind(null, vectors),point.vectors)
+    point: function(states, vectors, points, point){
+        each(remove.vector.bind(null, states, vectors),point.vectors)
         delete points[point.id]
+        delete states[point.id]
     }
 }
 

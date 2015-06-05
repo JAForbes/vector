@@ -5,6 +5,14 @@ var each = function(visitor, obj){
     return obj
 }
 
+var clone = function(object){
+    var r = {}
+    each(function(val, key){
+        r[key] = val
+    },object)
+    return r
+}
+
 //todo-james use a qtree or something later
 var closest = function(points, target){
     var origin
@@ -77,13 +85,13 @@ var update = function(){
     if( mouse.is.doubleclick ){
         if( hovered ){
             //remove hovered
-            remove.point( vectors, points, hovered )
+            remove.point( states, vectors, points, hovered )
         } else {
             //remove last added
-            remove.point( vectors, points, target )
+            remove.point( states, vectors, points, target )
         }
         if( hovered_line) {
-            remove.vector( vectors, hovered_line)
+            remove.vector( states, vectors, hovered_line)
         }
     }
 
@@ -92,6 +100,20 @@ var update = function(){
 var render = function(){
     can.width = window.innerWidth
     can.height = window.innerHeight
+
+    each(function(vector){
+        var a = points[vector.points[0]].position
+        var b = points[vector.points[1]].position
+
+        con.beginPath()
+        var style = state_types[states[vector.id]] || state_types["default"]
+        con.strokeStyle = vector == hovered_line ? "red" : style.strokeStyle
+        con.lineWidth = style.lineWidth
+
+        con.moveTo(a.x, a.y)
+        con.lineTo(b.x,b.y)
+        con.stroke()
+    }, vectors)
 
     each(function(point){
         var style = state_types[states[point.id]]
@@ -107,19 +129,6 @@ var render = function(){
         }
 
     }, points)
-    each(function(vector){
-        var a = points[vector.points[0]].position
-        var b = points[vector.points[1]].position
-
-        con.beginPath()
-        var style = state_types[states[vector.id]] || state_types["default"]
-        con.strokeStyle = vector == hovered_line ? "red" : style.strokeStyle
-        con.lineWidth = style.lineWidth
-
-        con.moveTo(a.x, a.y)
-        con.lineTo(b.x,b.y)
-        con.stroke()
-    }, vectors)
 }
 
 var loop = function(){
@@ -133,12 +142,17 @@ var persistence = {
         if(id_counter > 1){
           localStorage.setItem("points",JSON.stringify(points))
           localStorage.setItem("vectors",JSON.stringify(vectors))
+          localStorage.setItem("states",JSON.stringify(states))
+          localStorage.setItem("state_types",JSON.stringify(state_types))
           localStorage.setItem("id_counter", id_counter )
         }
     },
     load: function(){
         points = JSON.parse(localStorage.getItem("points")) || {}
         vectors = JSON.parse(localStorage.getItem("vectors")) || {}
+        states = JSON.parse(localStorage.getItem("states")) || {}
+        state_types = JSON.parse(localStorage.getItem("state_types")) || {"default" : { fillStyle: "black", strokeStyle:"black", lineWidth: 1 }}
+
         id_counter = Number(localStorage.getItem("id_counter")) || id_counter
     },
     clear: function(){
@@ -152,15 +166,9 @@ var persistence = {
 var id_counter = 1
 var vectors = {}
 var points = {}
-var state_types = {
-    "default" : { fillStyle: "black", strokeStyle:"black", lineWidth: 1 },
-    "special" : { fillStyle: "blue", strokeStyle:"blue", lineWidth: 1 },
-    "crazy" : { fillStyle: "orange", strokeStyle:"orange", lineWidth: 5 }
-}
-var states = {
-    "point_1" : "special",
-    "vector_10" : "crazy"
-}
+var state_types = {}
+var states = {}
+
 var selected = null;
 var hovered = null;
 var hovered_line = null;
@@ -172,34 +180,98 @@ document.body.appendChild(can)
 mouse.config.manual_update = true
 mouse.config.element = can
 mouse.startListening()
-persistence.load()
-setInterval(persistence.save,1000)
-loop()
 
-var addStateElement = function(){
+var addStateElement = function(key, colour, lineWidth){
     var state_node = state_template_item.cloneNode(true)
     state_node.id=""
+
+    //key == "default" && (state_node.childNodes[1].disabled = true) && (state_node.childNodes[1].readonly = true)
+    key && (state_node.childNodes[1].value = key)
+    key && state_node.setAttribute("data-previous", key)
+    colour && (state_node.childNodes[3].value = colour)
+    lineWidth && (state_node.childNodes[5].value = lineWidth)
     state_list.appendChild(state_node)
 }
 document.addEventListener('DOMContentLoaded',function(){
-    addStateElement()
 
+    persistence.load()
+    each(function(state, key){
+        addStateElement(key, state.fillStyle, state.lineWidth)
+    },state_types)
+    setInterval(persistence.save,1000)
+    loop()
+
+    state_list.addEventListener("click",function(event){
+        var button = event.srcElement
+        var li = button.parentElement
+        var keyEl = li.childNodes[1]
+        var prev = li.getAttribute("data-previous")
+
+        if(button.type == "submit"){
+            li.remove()
+            delete state_types[prev]
+
+            //set back to default style state
+            for(var key in states){
+                var val = states[key]
+                if( val == prev) {
+                    states[key] = input.value
+
+                    delete states[key]
+                }
+            }
+
+        }
+
+    })
 
     //state list view logic
-    state_list.addEventListener("input",function(event){
+    state_list.addEventListener('input',function(event){
       var input = event.srcElement
-      var li = input.parentElement
-      var last_li = state_list.childNodes[state_list.childNodes.length-1]
-      var second_last_li =state_list.childNodes[state_list.childNodes.length-2]
-      var isEmpty = input.value.length == 0
 
-      if(li == last_li){
-        if(!isEmpty){
-          addStateElement()
+      var li = input.parentElement
+      if(input.type == "text") {
+
+        var li = input.parentElement
+        var last_li = state_list.childNodes[state_list.childNodes.length-1]
+        var second_last_li =state_list.childNodes[state_list.childNodes.length-2]
+        var isEmpty = input.value.length == 0
+
+        if(li == last_li){
+            if(!isEmpty){
+              addStateElement()
+            }
         }
+
+
+        var prev = li.getAttribute("data-previous")
+        //code behind
+        if(!isEmpty){
+            //update key
+            state_types[input.value] = state_types[prev] || clone( state_types["default"] )
+            delete state_types[prev]
+
+            //todo-james not very performance friendly, but we're optimizing for rendering not input change
+
+            //update style state keys
+            for(var key in states){
+                var val = states[key]
+                if( val == prev) {
+                    states[key] = input.value
+                }
+            }
+
+            li.setAttribute("data-previous", input.value)
+        }
+
+      } else {
+        var key = li.childNodes[1].value
+        var state_type = state_types[key]
+        state_type.fillStyle = state_type.strokeStyle = li.childNodes[3].value
+        state_type.lineWidth = li.childNodes[5].value
       }
-      if(li == second_last_li && isEmpty){
-        li.remove()
-      }
+
     })
+
+
 })
