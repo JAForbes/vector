@@ -19,12 +19,17 @@
 		    	width: 100%;
 		    }
 		    .ne {
-		    	position: fixed;
+		    	position: absolute;
 		    	top: 0;
 		    	right: 0;
 		    }
+		    .nw {
+		    	position: absolute;
+		    	top: 0;
+		    	left: 0;
+		    }
 		    .sw {
-		    	position: fixed;
+		    	position: absolute;
 		    	bottom: 0;
 		    	left: 0;
 		    }
@@ -35,6 +40,9 @@
 		    	width: 500px;
 		    	resize: vertical;
 
+		    }
+		    .breathing_room {
+		    	margin: 1em;
 		    }
 		    .translucent {
 		    	background-color: rgba(255,255,255,0.8)
@@ -63,7 +71,7 @@
 
 		<li id="state_template_item">
 
-			<input placeholder="default" type="text"></input>
+			<input type="text"></input>
 			<input type="color"></input>
 			<input type="range" max="10" min="1" step="1" placeholder="1"></input>
 			<button>x</button>
@@ -72,6 +80,7 @@
 	</div>
 	<div class="unselectable">
 		<div  class="resizeable translucent ne">
+			<button id="btn_add_state_type" class="nw breathing_room">+</button>
 			<ul id="state_list" class="plain">
 			</ul>
 		</div>

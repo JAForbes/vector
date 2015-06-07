@@ -1,3 +1,9 @@
+var cmp = function(n){
+  return n > 0 ?  1 :
+         n < 0 ? -1 :
+         0
+}
+
 var each = function(visitor, obj){
     for(var key in obj){
         visitor(obj[key], key, obj)
@@ -108,8 +114,8 @@ var render = function(){
 
         con.beginPath()
         var style = state_types[states[vector.id]] || state_types["default"]
-        con.strokeStyle = vector == hovered_line ? "red" : style.strokeStyle
-        con.lineWidth = style.lineWidth
+        con.strokeStyle = style.strokeStyle
+        con.lineWidth = Number(style.lineWidth) * (vector == hovered_line ? 2 : 1)
 
         con.moveTo(a.x, a.y)
         con.lineTo(b.x,b.y)
@@ -185,13 +191,18 @@ mouse.startListening()
 var addStateElement = function(key, colour, lineWidth){
     var state_node = state_template_item.cloneNode(true)
     state_node.id=""
-
-    //key == "default" && (state_node.childNodes[1].disabled = true) && (state_node.childNodes[1].readonly = true)
+    key = key || ""
+    key == "default" && (state_node.childNodes[1].disabled = true) && (state_node.childNodes[1].readonly = true)
     key && (state_node.childNodes[1].value = key)
     key && state_node.setAttribute("data-previous", key)
     colour && (state_node.childNodes[3].value = colour)
     lineWidth && (state_node.childNodes[5].value = lineWidth)
+
+    //input
     state_list.appendChild(state_node)
+
+    //initialize state types in case colour, or stroke is edited by a name is given
+    state_types[key] = typeof state_types[key] != "undefined" ? state_types[key] : clone(state_types["default"])
 }
 document.addEventListener('DOMContentLoaded',function(){
 
@@ -216,8 +227,6 @@ document.addEventListener('DOMContentLoaded',function(){
             for(var key in states){
                 var val = states[key]
                 if( val == prev) {
-                    states[key] = input.value
-
                     delete states[key]
                 }
             }
@@ -226,8 +235,23 @@ document.addEventListener('DOMContentLoaded',function(){
 
     })
 
+    can.addEventListener("mousewheel", function(e){
+      if(hovered_line){
+        var direction = cmp(e.deltaY)
+        var state_type_list = Object.keys(state_types)
+        var current_state = typeof states[hovered_line.id] !== "undefined" ? states[hovered_line.id] : "default"
+        var current_state_index = state_type_list.indexOf( current_state )
+        states[hovered_line.id] = state_type_list[ (current_state_index + state_type_list.length + direction) % state_type_list.length]
+
+      }
+    })
+
+    btn_add_state_type.addEventListener("click", function(event){
+        addStateElement()
+    })
+
     //state list view logic
-    state_list.addEventListener('input',function(event){
+    state_list.addEventListener('input',function onInput(event){
       var input = event.srcElement
 
       var li = input.parentElement
