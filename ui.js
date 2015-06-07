@@ -71,7 +71,8 @@ var ui = {
           var inputs = [
             m('input[type=text]', {
                 value: state_type_name,
-                oninput: this.updateStateTypeName.bind(this, state_types, state_type_name)
+                oninput: this.updateStateTypeName.bind(this, state_types, state_type_name),
+                disabled: i == 0
             }),
             m('input[type=color]', {
                 value: state_type.strokeStyle,
