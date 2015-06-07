@@ -38,12 +38,13 @@ var ui = {
     },
 
     cycleStateType: function(e){
-        if(hovered_line){
+        var target = hovered_line || hovered
+        if(target){
             var direction = cmp(e.deltaY)
             var state_type_list = Object.keys(state_types)
-            var current_state = typeof states[hovered_line.id] !== "undefined" ? states[hovered_line.id] : "default"
+            var current_state = typeof states[target.id] !== "undefined" ? states[target.id] : "default"
             var current_state_index = state_type_list.indexOf( current_state )
-            states[hovered_line.id] = state_type_list[ (current_state_index + state_type_list.length + direction) % state_type_list.length]
+            states[target.id] = state_type_list[ (current_state_index + state_type_list.length + direction) % state_type_list.length]
         }
     },
 
@@ -79,7 +80,7 @@ var ui = {
             m('input[type=range]', {
                 value: state_type.lineWidth,
                 oninput: m.withAttr("value", this.updateStateLineWidth.bind(this,state_type)),
-                max:10, min:1, step:1, placeholder:1
+                max:10, min:1, step:1, placeholder:5
             }),
           ]
           return m("li",
