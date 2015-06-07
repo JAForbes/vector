@@ -16,7 +16,7 @@ var ui = {
 
         if(li == last_li){
             if(!isEmpty){
-              addStateElement()
+              ui.addStateElement()
             }
         }
 
@@ -91,9 +91,11 @@ var ui = {
         var keyEl = li.childNodes[1]
         var prev = li.getAttribute("data-previous")
 
+
         if(button.type == "submit"){
             li.remove()
             delete state_types[prev]
+            delete state_types[keyEl.value]
 
             //set back to default style state
             for(var key in states){
