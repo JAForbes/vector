@@ -152,9 +152,6 @@ mouse.startListening()
 document.addEventListener('DOMContentLoaded', function(){
     persistence.load()
     ui.init()
-     each(function(state, key){
-        ui.addStateElement(key, state.fillStyle, state.lineWidth)
-    },state_types)
     setInterval(persistence.save,1000)
     loop()
 })
