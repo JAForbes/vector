@@ -68,19 +68,32 @@ var ui = {
           var state_type = state_types[state_type_name]
 
           var inputs = [
-            m('input[type=text]', { value: state_type_name, oninput: this.updateStateTypeName.bind(this, state_types, state_type_name) } ),
-            m('input[type=color]', {value: state_type.strokeStyle , oninput: m.withAttr("value", this.updateStateTypeColor.bind(this, state_type)) }),
+            m('input[type=text]', {
+                value: state_type_name,
+                oninput: this.updateStateTypeName.bind(this, state_types, state_type_name)
+            }),
+            m('input[type=color]', {
+                value: state_type.strokeStyle,
+                oninput: m.withAttr("value", this.updateStateTypeColor.bind(this, state_type))
+            }),
             m('input[type=range]', {
                 value: state_type.lineWidth,
                 oninput: m.withAttr("value", this.updateStateLineWidth.bind(this,state_type)),
                 max:10, min:1, step:1, placeholder:1
             }),
-            m('button', { onclick: this.removeStateType.bind(this, states, state_types, state_type_name) }, "X")
           ]
           return m("li",
-            //Don't add remove button to first item
-            i > 0 ? inputs : inputs.slice(0,-1)
+            //Add a remove button after the first item
+            i == 0 ?
+                inputs :
+
+                inputs.concat(
+                    m('button', {
+                        onclick: this.removeStateType.bind(this, states, state_types, state_type_name)
+                    }, "X")
+                )
           )
+
         },this)
     }
 }
