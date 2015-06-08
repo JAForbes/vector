@@ -13,6 +13,11 @@ var ui = {
         //create or update the state type
         state_types[el.value] = typeof state_types[prev] != "undefined" ? state_types[prev] : clone(state_types["default"])
         delete state_types[prev]
+
+        //todo-james state_type_order is global
+        state_type_order[el.value] = state_type_order[prev]
+        delete state_type_order[prev]
+
         //update style state keys
         for(var key in states){
             var val = states[key]
@@ -34,6 +39,7 @@ var ui = {
 
     createStateType: function(event){
         state_types[""] = clone(state_types["default"])
+        state_type_order[""] = "state_" + (++id_counter)
         m.render(state_list, this.state_type_list(states, state_types))
     },
 
@@ -52,6 +58,7 @@ var ui = {
         var button = event.srcElement
 
         delete state_types[state_type_name]
+        delete state_type_order[state_type_name]
 
         //set back to default style state
         for(var key in states){
@@ -64,7 +71,9 @@ var ui = {
     },
 
     state_type_list: function(states, state_types){
-      return Object.keys(state_types)
+      return _.sortBy( _.keys(state_types), function(state_type_name){
+            return state_type_order[state_type_name]
+        })
         .map(function(state_type_name, i){
           var state_type = state_types[state_type_name]
 

@@ -88,11 +88,11 @@ var render = function(){
         if(point.nVectors == 0 || point == hovered || point == selected || style){
             style = style || state_types["default"]
 
-            con.fillStyle = selected == point ? "red" :
-            hovered == point ? "aqua" : style.fillStyle
+            var d = 10 * (point == hovered ? 1.3 : 1)
+            con.fillStyle = style.fillStyle
 
 
-            con.fillRect(point.position.x-5,point.position.y-5,10,10)
+            con.fillRect(point.position.x-d/2,point.position.y-d/2,d,d)
         }
 
     }, points)
@@ -119,7 +119,7 @@ var persistence = {
         vectors = JSON.parse(localStorage.getItem("vectors")) || {}
         states = JSON.parse(localStorage.getItem("states")) || {}
         state_types = JSON.parse(localStorage.getItem("state_types")) || {"default" : { fillStyle: "black", strokeStyle:"black", lineWidth: 1 }}
-
+        state_type_order = JSON.parse(localStorage.getItem("state_type_order")) || { "default": "state_" + (++id_counter) }
         id_counter = Number(localStorage.getItem("id_counter")) || id_counter
     },
     clear: function(){
@@ -129,11 +129,20 @@ var persistence = {
     }
 }
 
+var initStateOrder = function(){
+    _.each(state_types, function(state_type, state_type_name){
+      if(!state_type_order[state_type_name]){
+        state_type_order[state_type_name] = "state_" + (++id_counter)
+      }
+    })
+}
+
 
 var id_counter = 1
 var vectors = {}
 var points = {}
 var state_types = {}
+var state_type_order = {}
 var states = {}
 
 var selected = null;
@@ -151,6 +160,7 @@ mouse.startListening()
 
 document.addEventListener('DOMContentLoaded', function(){
     persistence.load()
+    initStateOrder()
     ui.init()
     setInterval(persistence.save,1000)
     loop()
