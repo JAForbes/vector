@@ -39,19 +39,20 @@ var ui = {
 
     createStateType: function(event){
         state_types[""] = clone(state_types["default"])
-        state_type_order[""] = "state_" + (++id_counter)
+        state_type_order[""] = (++id_counter)
         m.render(state_list, this.state_type_list(states, state_types))
     },
 
     cycleStateType: function(e){
-        var target = hovered_line || hovered
-        if(target){
-            var direction = cmp(e.deltaY)
-            var state_type_list = Object.keys(state_types)
-            var current_state = typeof states[target.id] !== "undefined" ? states[target.id] : "default"
-            var current_state_index = state_type_list.indexOf( current_state )
-            states[target.id] = state_type_list[ (current_state_index + state_type_list.length + direction) % state_type_list.length]
-        }
+        //todo-james not functional
+        var target = hovered_line || hovered || { id: "active_style"}
+        var direction = cmp(e.deltaY)
+        var state_type_list = Object.keys(state_types)
+
+        var current_state = typeof states[target.id] !== "undefined" ? states[target.id] : "default"
+        var current_state_index = state_type_list.indexOf( current_state )
+        states[target.id] = state_type_list[ (current_state_index + state_type_list.length + direction) % state_type_list.length]
+
     },
 
     removeStateType: function(states, state_types, state_type_name, event){

@@ -38,14 +38,19 @@ var update = function(){
         selected.position.y = mouse.positions.current.y
     }
     if(!hovered && !hovered_line && mouse.is.release ){
+        var created_id = null;
+
         if(mouse.is.dragend){
 
-            origin.point && target.point &&
+            created_id = origin.point && target.point &&
                 add.vector( id_counter++, vectors, origin.point, target.point)
 
         } else {
-            add.point(id_counter++, points, {x: mouse.positions.current.x, y: mouse.positions.current.y} )
+            created_id = add.point(id_counter++, points, {x: mouse.positions.current.x, y: mouse.positions.current.y} )
 
+        }
+        if( created_id && states.active_style != "default") {
+             states[created_id] = states.active_style
         }
     }
 
@@ -64,9 +69,26 @@ var update = function(){
 
 }
 
+var drawPoint = function(point){
+        var style = state_types[states[point.id]]
+
+        if(point.nVectors == 0 || point == hovered || point == selected || style){
+            style = style || state_types["default"]
+
+            var d = 10 * (point == hovered ? 1.3 : 1)
+            con.fillStyle = style.fillStyle
+
+
+            con.fillRect(point.position.x-d/2,point.position.y-d/2,d,d)
+        }
+
+    }
+
 var render = function(){
     can.width = window.innerWidth
     can.height = window.innerHeight
+
+    drawPoint({ id: "active_style", position: clone(mouse.positions.current) , nVectors: 0, vectors: {} })
 
     each(function(vector){
         var a = points[vector.points[0]].position
@@ -82,20 +104,7 @@ var render = function(){
         con.stroke()
     }, vectors)
 
-    each(function(point){
-        var style = state_types[states[point.id]]
-
-        if(point.nVectors == 0 || point == hovered || point == selected || style){
-            style = style || state_types["default"]
-
-            var d = 10 * (point == hovered ? 1.3 : 1)
-            con.fillStyle = style.fillStyle
-
-
-            con.fillRect(point.position.x-d/2,point.position.y-d/2,d,d)
-        }
-
-    }, points)
+    each(drawPoint, points)
 }
 
 var loop = function(){
@@ -111,7 +120,9 @@ var persistence = {
           localStorage.setItem("vectors",JSON.stringify(vectors))
           localStorage.setItem("states",JSON.stringify(states))
           localStorage.setItem("state_types",JSON.stringify(state_types))
+          localStorage.setItem("state_type_order", JSON.stringify(state_type_order))
           localStorage.setItem("id_counter", id_counter )
+          states.active_style = states.active_style || "default"
         }
     },
     load: function(){
@@ -150,6 +161,7 @@ var hovered = null;
 var hovered_line = null;
 
 var can = document.createElement("canvas")
+
 var con = can.getContext("2d")
 
 document.body.appendChild(can)

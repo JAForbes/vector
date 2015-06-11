@@ -117,7 +117,7 @@ var mouse = {
     },
 
     positions: {
-        current: { x:Infinity , y: Infinity},
+        current: { x:400 , y: 400},
         click: { x:Infinity, y: Infinity},
     },
 
