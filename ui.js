@@ -1,7 +1,9 @@
 var ui = {
 
     init: function(){
-        can.addEventListener("mousewheel", this.cycleStateType)
+        can.addEventListener("mousewheel",
+            this.cycleStateType.bind(this)
+        )
         btn_add_state_type.addEventListener("click", this.createStateType.bind(this))
         m.render(state_list, this.state_type_list(states, state_types))
     },
@@ -52,6 +54,7 @@ var ui = {
         var current_state = typeof states[target.id] !== "undefined" ? states[target.id] : "default"
         var current_state_index = state_type_list.indexOf( current_state )
         states[target.id] = state_type_list[ (current_state_index + state_type_list.length + direction) % state_type_list.length]
+        m.render(state_list, this.state_type_list(states, state_types))
 
     },
 
@@ -82,7 +85,8 @@ var ui = {
             m('input[type=text]', {
                 value: state_type_name,
                 oninput: this.updateStateTypeName.bind(this, state_types, state_type_name),
-                disabled: i == 0
+                disabled: i == 0,
+                class: state_type_name == states.active_style ? "selected" : ""
             }),
             m('input[type=color]', {
                 value: state_type.strokeStyle,
