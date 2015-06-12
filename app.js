@@ -88,8 +88,6 @@ var render = function(){
     can.width = window.innerWidth
     can.height = window.innerHeight
 
-    drawPoint({ id: "active_style", position: clone(mouse.positions.current) , nVectors: 0, vectors: {} })
-
     each(function(vector){
         var a = points[vector.points[0]].position
         var b = points[vector.points[1]].position
@@ -105,6 +103,9 @@ var render = function(){
     }, vectors)
 
     each(drawPoint, points)
+
+    //draw cursor last, so it is on top
+    drawPoint({ id: "active_style", position: clone(mouse.positions.current) , nVectors: 0, vectors: {} })
 }
 
 var loop = function(){
