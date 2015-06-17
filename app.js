@@ -192,6 +192,25 @@ var initStateOrder = function(){
     })
 }
 
+var shift_key = false;
+var alt_key = false;
+window.onkeydown = function(e){
+    if(!alt_key){
+        alt_key = e.keyCode == 18
+    }
+    if(!shift_key){
+        shift_key = e.keyCode == 16
+    }
+
+}
+window.onkeyup = function(e){
+    if(e.keyCode == 16){
+        shift_key = false
+    }
+    if(e.keyCode == 18){
+        alt_key = false
+    }
+}
 
 var id_counter = 1
 var vectors = {}
