@@ -40,12 +40,14 @@ var remove = {
         //remove vector from vectors collection
         delete vectors[v.id]
         delete states[v.id]
+        delete selected[v.id]
     },
 
     point: function(states, vectors, points, point){
         each(remove.vector.bind(null, states, vectors),point.vectors)
         delete points[point.id]
         delete states[point.id]
+        delete selected[point.id]
     }
 }
 

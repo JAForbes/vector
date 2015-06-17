@@ -7,24 +7,7 @@ var update = function(){
         if(target && target.distance < 15 ){
             hovered = target.point;
 
-            if(mouse.is.click){
 
-                if(!shift_key && !alt_key){
-                    selected = {}
-                }
-                if(alt_key){
-                    console.log("alt key")
-                    delete selected[hovered.id]
-                } else {
-                   selected[hovered.id] = {
-                        id: hovered.id,
-                        positions: {
-                            selected: _.clone(hovered.position)
-                        }
-                    }
-                }
-
-            }
         } else {
             hovered = null;
         }
@@ -42,6 +25,26 @@ var update = function(){
 
     }
 
+    var hover_target = hovered || hovered_line
+    if(hover_target && mouse.is.click){
+
+        if(!shift_key && !alt_key){
+            selected = {}
+        }
+        if(alt_key){
+            delete selected[hover_target.id]
+        } else {
+            selected[hover_target.id] = {
+                id: hover_target.id,
+                positions: {}
+            }
+
+            if( points[hover_target.id]) {
+                selected[hover_target.id].positions = _.clone(hover_target.position)
+            }
+        }
+
+    }
     if(mouse.is.click){
         _.each(selected, function(item, item_id){
             if(points[item_id]){
