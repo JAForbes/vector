@@ -95,6 +95,14 @@ var drawPoint = function(point){
         var style = state_types[states[point.id]]
 
         if(point.nVectors == 0 || point == hovered || selected[point.id] || style){
+
+
+            if( selected[point.id] ){
+                var d = 20
+                con.fillStyle = "#B8FFF5"
+                con.fillRect(point.position.x-d/2,point.position.y-d/2,d,d)
+            }
+
             style = style || state_types["default"]
 
             var d = 10 * (point == hovered ? 1.3 : 1)
@@ -102,6 +110,7 @@ var drawPoint = function(point){
 
 
             con.fillRect(point.position.x-d/2,point.position.y-d/2,d,d)
+
         }
 
     }
