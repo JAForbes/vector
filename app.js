@@ -122,11 +122,23 @@ var render = function(){
     each(function(vector){
         var a = points[vector.points[0]].position
         var b = points[vector.points[1]].position
+        var style = state_types[states[vector.id]] || state_types["default"]
+        var lineWidth = Number(style.lineWidth) * (vector == hovered_line ? 2 : 1)
+
+        if( selected[vector.id] ){
+            con.beginPath()
+            con.strokeStyle = "#B8FFF5"
+            con.lineWidth = _.max([lineWidth * 2.5,10])
+
+            con.moveTo(a.x, a.y)
+            con.lineTo(b.x,b.y)
+            con.stroke()
+        }
 
         con.beginPath()
-        var style = state_types[states[vector.id]] || state_types["default"]
+
         con.strokeStyle = style.strokeStyle
-        con.lineWidth = Number(style.lineWidth) * (vector == hovered_line ? 2 : 1)
+        con.lineWidth = lineWidth
 
         con.moveTo(a.x, a.y)
         con.lineTo(b.x,b.y)
