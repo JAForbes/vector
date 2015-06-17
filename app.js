@@ -8,17 +8,22 @@ var update = function(){
             hovered = target.point;
 
             if(mouse.is.click){
-                //todo-james allow for "adding to" and "removing from" a collection later
 
-
-                selected = {}
-
-                selected[hovered.id] = {
-                    id: hovered.id,
-                    positions: {
-                        selected: _.clone(hovered.position)
+                if(!shift_key && !alt_key){
+                    selected = {}
+                }
+                if(alt_key){
+                    console.log("alt key")
+                    delete selected[hovered.id]
+                } else {
+                   selected[hovered.id] = {
+                        id: hovered.id,
+                        positions: {
+                            selected: _.clone(hovered.position)
+                        }
                     }
                 }
+
             }
         } else {
             hovered = null;
@@ -37,12 +42,14 @@ var update = function(){
 
     }
 
-
-
-
-    if(mouse.is.release){
-        selected = {}
+    if(mouse.is.click){
+        _.each(selected, function(item, item_id){
+            if(points[item_id]){
+                item.positions.selected = _.clone(points[item_id].position)
+            }
+        })
     }
+
     if( mouse.is.down){
         _.each(selected, function(item, item_id){
             var p = points[item_id]
@@ -59,7 +66,7 @@ var update = function(){
         })
 
     }
-    if(!hovered && !hovered_line && mouse.is.release ){
+    if(!hovered && !hovered_line && mouse.is.release && Object.keys(selected).length == 0){
         var created_id = null;
 
         if(mouse.is.dragend){
@@ -88,6 +95,11 @@ var update = function(){
             remove.vector( states, vectors, hovered_line)
         }
     }
+
+    if(mouse.is.release && !mouse.is.dragend && (!hovered_line && !hovered)){
+        selected = {}
+    }
+
 
 }
 
