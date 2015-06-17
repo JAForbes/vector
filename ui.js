@@ -46,14 +46,20 @@ var ui = {
     },
 
     cycleStateType: function(e){
-        //todo-james not functional
-        var target = hovered_line || hovered || { id: "active_style"}
-        var direction = cmp(e.deltaY)
+        //todo-james not pure
+
+        var target = _.first(_.toArray(selected)) || hovered_line || hovered || { id: "active_style"}
         var state_type_list = Object.keys(state_types)
 
         var current_state = typeof states[target.id] !== "undefined" ? states[target.id] : "default"
         var current_state_index = state_type_list.indexOf( current_state )
-        states[target.id] = state_type_list[ (current_state_index + state_type_list.length + direction) % state_type_list.length]
+
+        var targets = _.isEmpty(selected) ? [target] : selected
+        _.each(targets, function(target ){
+            var direction = cmp(e.deltaY)
+            states[target.id] = state_type_list[ (current_state_index + state_type_list.length + direction) % state_type_list.length]
+
+        })
         m.render(state_list, this.state_type_list(states, state_types))
 
     },

@@ -28,9 +28,7 @@ var update = function(){
     var hover_target = hovered || hovered_line
     if(hover_target && mouse.is.click){
 
-        if(!shift_key && !alt_key){
-            selected = {}
-        }
+
         if(alt_key){
             delete selected[hover_target.id]
         } else {
@@ -99,7 +97,7 @@ var update = function(){
         }
     }
 
-    if(mouse.is.release && !mouse.is.dragend && (!hovered_line && !hovered)){
+    if(mouse.is.release && !shift_key && !mouse.is.dragend && (!hovered_line && !hovered)){
         selected = {}
     }
 
