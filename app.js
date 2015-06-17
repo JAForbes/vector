@@ -8,7 +8,17 @@ var update = function(){
             hovered = target.point;
 
             if(mouse.is.click){
-                selected = hovered
+                //todo-james allow for "adding to" and "removing from" a collection later
+
+
+                selected = {}
+
+                selected[hovered.id] = {
+                    id: hovered.id,
+                    positions: {
+                        selected: _.clone(hovered.position)
+                    }
+                }
             }
         } else {
             hovered = null;
@@ -31,11 +41,23 @@ var update = function(){
 
 
     if(mouse.is.release){
-        selected = null
+        selected = {}
     }
-    if(selected && mouse.is.down){
-        selected.position.x = mouse.positions.current.x
-        selected.position.y = mouse.positions.current.y
+    if( mouse.is.down){
+        _.each(selected, function(item, item_id){
+            var p = points[item_id]
+            var m = mouse.positions.current
+            var d  = {
+                x: mouse.positions.click.x - mouse.positions.current.x,
+                y: mouse.positions.click.y - mouse.positions.current.y,
+            }
+            if(p){
+                p.position.x = item.positions.selected.x - d.x
+                p.position.y = item.positions.selected.y - d.y
+
+            }
+        })
+
     }
     if(!hovered && !hovered_line && mouse.is.release ){
         var created_id = null;
@@ -72,7 +94,7 @@ var update = function(){
 var drawPoint = function(point){
         var style = state_types[states[point.id]]
 
-        if(point.nVectors == 0 || point == hovered || point == selected || style){
+        if(point.nVectors == 0 || point == hovered || selected[point.id] || style){
             style = style || state_types["default"]
 
             var d = 10 * (point == hovered ? 1.3 : 1)
@@ -130,7 +152,7 @@ var persistence = {
         points = JSON.parse(localStorage.getItem("points")) || {}
         vectors = JSON.parse(localStorage.getItem("vectors")) || {}
         states = JSON.parse(localStorage.getItem("states")) || {}
-        state_types = JSON.parse(localStorage.getItem("state_types")) || {"default" : { fillStyle: "black", strokeStyle:"black", lineWidth: 1 }}
+        state_types = JSON.parse(localStorage.getItem("state_types")) || {"default" : { fillStyle: "#000000", strokeStyle:"#000000", lineWidth: 1 }}
         state_type_order = JSON.parse(localStorage.getItem("state_type_order")) || { "default": "state_" + (++id_counter) }
         id_counter = Number(localStorage.getItem("id_counter")) || id_counter
     },
@@ -157,7 +179,7 @@ var state_types = {}
 var state_type_order = {}
 var states = {}
 
-var selected = null;
+var selected = {};
 var hovered = null;
 var hovered_line = null;
 
